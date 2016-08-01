@@ -26,12 +26,13 @@ export default Mixin.create({
   },
 
   _onQpChanged() {
-    let controllerProp = !!get(this, 'attrs.a') ? 'a' : `controller.${this.get('anchorQueryParam')}`;
-    let elem = $(`[data-anchor="${this.get(controllerProp)}"]`);
+    let qp = this.get('anchorQueryParam');
+    let qpVal = this.get(!!get(this, 'attrs.a') ? 'a' : `controller.${qp}`);
+    let elem = $(`[data-${qp}="${qpVal}"]`);
     if (!elem) {
       return;
     }
-    scheduleOnce('afterRender', this, this._scrollToElemPosition);
+    scheduleOnce('afterRender', this, this._scrollToElemPosition, elem);
   },
 
   didInsertElement() {
@@ -39,12 +40,9 @@ export default Mixin.create({
     this._scrollToElemPosition();
   },
 
-  _scrollToElemPosition() {
-    let qp = this.get('anchorQueryParam');
-    let qpVal = this.get(!!get(this, 'attrs.a') ? 'a' : `controller.${qp}`);
-    let elem = $(`[data-${qp}="${qpVal}"]`);
+  _scrollToElemPosition(elem) {
     let offset = (elem && elem.offset && elem.offset()) ? elem.offset().top : null;
-    if (offset) {
+    if (offset !== null) {
       $('body').scrollTop(offset);
     }
   }
